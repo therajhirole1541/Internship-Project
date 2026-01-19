@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Space Tourism Booking System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow: hidden;
+            background: url("https://images.theconversation.com/files/446994/original/file-20220217-13-d3tz1j.jpg?ixlib=rb-4.1.0&rect=0%2C0%2C3946%2C1778&q=20&auto=format&w=320&fit=clip&dpr=2&usm=12&cs=strip") no-repeat center center/cover;
+        }
+
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        p { color: black; }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(10,10,35,0.85);
+            padding: 15px 30px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .navbar a:hover { color: #00ccff; }
+
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #1a1a40;
+            min-width: 150px;
+            right: 0;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #00ccff;
+            color: black;
+        }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        .main {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        .left {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .left h1 { font-size: 60px; margin: 0; }
+        .left p {
+            margin-top: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .right { flex: 1; position: relative; }
+
+        .register-btn {
+            position: absolute;
+            top: 90%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(90deg, #00ccff, #0066ff);
+            color: white;
+            border-radius: 100px;
+            padding: 25px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 0 20px rgba(0,204,255,0.8);
+            animation: pulseGlow 1.5s infinite;
+            transition: all 0.3s ease;
+        }
+        .register-btn:hover {
+            background: linear-gradient(90deg, #0066ff, #00ccff);
+            box-shadow: 0 0 30px rgba(255,255,255,0.9);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(0,204,255,0.6); }
+            50% { box-shadow: 0 0 35px rgba(0,204,255,1); }
+            100% { box-shadow: 0 0 15px rgba(0,204,255,0.6); }
+        }
+
+        .floating-text {
+            animation: floatUpDown 4s ease-in-out infinite;
+        }
+        @keyframes floatUpDown {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .main { flex-direction: column; text-align: center; }
+            .left, .right { padding: 20px; }
+            .register-btn { position: static; transform: none; margin-top: 20px; }
+            .navbar { flex-direction: column; align-items: flex-start; }
+            .navbar a { margin: 10px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starCanvas"></canvas>
+
+    <div class="navbar">
+        <div><a href="index.html"><strong>SpaceXperience</strong></a></div>
+        <div>
+            <div class="dropdown">
+                <a href="#">Login</a>
+                <div class="dropdown-content">
+                    <a href="userlogin.html">User Login</a>
+                    <a href="adminLogin.html">Admin Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="left floating-text">
+            <p style="color: black;">SO, YOU WANT TO TRAVEL TO</p>
+            <h1 style="color: black;">SPACE</h1>
+            <p style="color: black;">
+                Let's face it: if you want to go to space, you might as well genuinely go to outer space 
+                and not hover kind of on the edge of it. Well sit back, and relax because we’ll give you a 
+                truly out of this world experience!
+            </p>
+        </div>
+        <div class="right">
+            <a href="register.html" class="register-btn">REGISTER</a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight / 2;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Create stars with horizontal speed (moving right to left)
+        for (let i = 0; i < 200; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: 0.5 + Math.random() * 1.5 // slow drift for space effect
+            });
+        }
+
+        // Animate stars moving right to left
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Move star left
+                star.x -= star.speed;
+
+                // If star goes off left edge, reset to right
+                if (star.x < 0) {
+                    star.x = canvas.width;
+                    star.y = Math.random() * canvas.height;
+                    star.speed = 0.5 + Math.random() * 1.5;
+                }
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        animateStars();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

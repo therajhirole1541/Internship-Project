@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>User Login - Space Tourism</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: black;
+            color: white;
+            overflow: hidden;
+        }
+
+        /* Starfield background */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300%;
+            height: 300%;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+            animation: stars 100s linear infinite;
+            opacity: 0.4;
+            z-index: -2;
+        }
+        @keyframes stars {
+            from { transform: translate(0,0); }
+            to { transform: translate(-1000px,-1000px); }
+        }
+
+        /* Moonlight glow */
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,200,0.3), transparent 70%);
+            top: 10%;
+            right: 10%;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -2;
+        }
+
+        /* Shooting stars canvas */
+        #shootingStarsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Login container */
+        .container {
+            position: relative;
+            background: rgba(18, 18, 48, 0.85);
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 204, 255, 0.4);
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 1s ease-in-out;
+            z-index: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            color: #00ccff;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-shadow: 0 0 8px #00ccff;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            padding: 12px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255,255,255,0.08);
+            color: white;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            background: rgb(233, 235, 235);
+            box-shadow: 0 0 6px #00ccff;
+        }
+
+        button {
+            background: linear-gradient(90deg, #00ccff, #0066ff);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+            box-shadow: 0 0 10px rgba(0,204,255,0.5);
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #00e6ff, #3399ff);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,204,255,0.8);
+        }
+
+        p {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        p a {
+            color: #00ccff;
+            text-decoration: none;
+        }
+
+        p a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Shooting Stars Canvas -->
+    <canvas id="shootingStarsCanvas"></canvas>
+
+    <div class="container">
+        <h2>🔐 User Login</h2>
+        <form action="LoginServlet" method="post">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="register.html">Register</a></p>
+        <p><a href="index.html">Home Page</a></p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('shootingStarsCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createShootingStar() {
+            return {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height / 2, // Top half only
+                length: Math.random() * 80 + 50,
+                speed: Math.random() * 4 + 6,
+                angle: Math.PI / 4, // 45 degrees
+                opacity: 1
+            };
+        }
+
+        function drawShootingStar(star) {
+            ctx.strokeStyle = `rgba(255, 255, 255, ${star.opacity})`;
+            ctx.shadowBlur = 10; // glow effect
+            ctx.shadowColor = 'white';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(star.x, star.y);
+            ctx.lineTo(
+                star.x - star.length * Math.cos(star.angle),
+                star.y - star.length * Math.sin(star.angle)
+            );
+            ctx.stroke();
+            ctx.shadowBlur = 0; // reset glow
+        }
+
+        function updateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach((star, index) => {
+                star.x += star.speed * Math.cos(star.angle);
+                star.y += star.speed * Math.sin(star.angle);
+                star.opacity -= 0.02;
+                drawShootingStar(star);
+
+                if (star.opacity <= 0) stars.splice(index, 1);
+            });
+
+            if (Math.random() < 0.02) stars.push(createShootingStar());
+
+            requestAnimationFrame(updateStars);
+        }
+
+        updateStars();
+    </script>
+
+</body>
+</html>

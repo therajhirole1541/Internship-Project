@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Space Tourism</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at bottom, #0a0a23, #000);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Stars canvas */
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Frosted glass effect */
+        .form-container {
+            background: rgba(18, 18, 48, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 400px;
+            animation: floatUpDown 5s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00ccff;
+            text-shadow: 0 0 8px rgba(0, 204, 255, 0.8);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(31, 31, 61, 0.8);
+            color: white;
+            font-size: 14px;
+            box-shadow: inset 0 0 5px rgba(0, 204, 255, 0.3);
+            transition: box-shadow 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(0, 204, 255, 0.8);
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(90deg, #00ccff, #0066ff);
+            color: #000;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 204, 255, 0.6);
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #0066ff, #00ccff);
+            color: white;
+            box-shadow: 0 0 25px rgba(0, 204, 255, 1);
+        }
+
+        .login-link {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #00ccff;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .form-container {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Floating animation */
+        @keyframes floatUpDown {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starCanvas"></canvas>
+
+    <div class="form-container">
+        <h2>Register</h2>
+        <form method="post" action="RegisterServlet">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div class="login-link">
+            <p>Already registered? <a href="userlogin.html">Login</a></p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Create stars with horizontal drift
+        for (let i = 0; i < 200; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: 0.2 + Math.random() * 0.8 // slower for calm effect
+            });
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                star.x -= star.speed;
+
+                if (star.x < 0) {
+                    star.x = canvas.width;
+                    star.y = Math.random() * canvas.height;
+                }
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        animateStars();
+    </script>
+
+</body>
+</html>
+
+
